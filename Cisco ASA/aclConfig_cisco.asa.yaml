@@ -1,0 +1,27 @@
+---
+- name: Configure ACL on ASA
+  hosts: cisco_asa
+  gather_facts: false
+  tasks:
+  - name: Configure ACL
+    cisco.asa.asa_acl:
+      provider: "{{ login_provider }}"
+      name: my_acl
+      state: present
+      access_list:
+      - name: my_acl_rule1
+        action: permit
+        protocol: tcp
+        src: any
+        src_port: any
+        dst: any
+        dst_port: eq 80
+  - name: Verify ACL configuration
+    cisco.asa.asa_command:
+      provider: "{{ login_provider }}"
+      commands:
+      - show run access-list my_acl
+    register: acl_check
+  - name: Display ACL configuration
+    debug:
+      var: acl_check

@@ -1,0 +1,28 @@
+---
+- name: Configure site-to-site VPN on ASA
+  hosts: cisco_asa
+  gather_facts: false
+  tasks:
+  - name: Configure VPN parameters
+    asa_vpn:
+      host: "{{ inventory_hostname }}"
+      username: "ansible"
+      password: "secret"
+      vpn_type: ipsec
+      vpn_mode: site_to_site
+      vpn_peer: "192.0.2.1"
+      vpn_profile_name: "my_vpn_profile"
+      vpn_access_list: "my_vpn_acl"
+      state: present
+  - name: Verify VPN configuration
+    asa_command:
+      host: "{{ inventory_hostname }}"
+      username: "ansible"
+      password: "secret"
+      commands:
+      - show run crypto ipsec profile
+      - show crypto isakmp sa
+    register: vpn_check
+  - name: Display VPN configuration
+    debug:
+      var: vpn_check

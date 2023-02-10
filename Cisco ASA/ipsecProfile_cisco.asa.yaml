@@ -1,0 +1,22 @@
+---
+- name: Configure IPSec profile on ASA
+  hosts: cisco_asa
+  gather_facts: false
+  tasks:
+  - name: Configure IPSec parameters
+    cisco.asa.asa_crypto_ipsec_profile:
+      provider: "{{ login_provider }}"
+      name: my_ipsec_profile
+      state: present
+      esp:
+        encryption: aes256
+        hash: sha256
+  - name: Verify IPSec profile configuration
+    cisco.asa.asa_command:
+      provider: "{{ login_provider }}"
+      commands:
+      - show run crypto ipsec profile
+    register: ipsec_check
+  - name: Display IPSec profile configuration
+    debug:
+      var: ipsec_check

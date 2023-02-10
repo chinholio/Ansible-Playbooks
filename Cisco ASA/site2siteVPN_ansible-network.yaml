@@ -1,0 +1,25 @@
+---
+- name: Configure site-to-site VPN on ASA
+  hosts: cisco_asa
+  gather_facts: false
+  tasks:
+  - name: Configure VPN parameters
+    ios_crypto_ipsec_profile:
+      provider: "{{ login_provider }}"
+      name: my_vpn_profile
+      state: present
+    ios_ip_sec_peer:
+      provider: "{{ login_provider }}"
+      name: 192.0.2.1
+      profile: my_vpn_profile
+      state: present
+  - name: Verify VPN configuration
+    ios_command:
+      provider: "{{ login_provider }}"
+      commands:
+      - show run crypto ipsec profile
+      - show crypto isakmp sa
+    register: vpn_check
+  - name: Display VPN configuration
+    debug:
+      var: vpn_check
