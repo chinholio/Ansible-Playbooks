@@ -1,3 +1,4 @@
+# Creates IPSec profiles on Cisco ASA Devices
 ---
 - name: Configure IPSec profile on ASA
   hosts: cisco_asa
@@ -6,7 +7,7 @@
   - name: Configure IPSec parameters
     cisco.asa.asa_crypto_ipsec_profile:
       provider: "{{ login_provider }}"
-      name: my_ipsec_profile
+      name: IPSEC_256_PROFILE
       state: present
       esp:
         encryption: aes256

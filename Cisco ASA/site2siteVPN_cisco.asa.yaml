@@ -1,3 +1,4 @@
+# Create VPN on ASA appliance
 ---
 - name: Configure site-to-site VPN on ASA
   hosts: cisco_asa
@@ -6,12 +7,12 @@
   - name: Configure VPN parameters
     cisco.asa.asa_crypto_ipsec_profile:
       provider: "{{ login_provider }}"
-      name: my_vpn_profile
+      name: VPN_2_VENDOR
       state: present
     cisco.asa.asa_ip_sec_peer:
       provider: "{{ login_provider }}"
       name: 192.0.2.1
-      profile: my_vpn_profile
+      profile: IPSEC_256_PROFILE
       state: present
   - name: Verify VPN configuration
     cisco.asa.asa_command:
