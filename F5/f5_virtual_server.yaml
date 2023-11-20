@@ -1,0 +1,33 @@
+---
+- name: Create an F5 virtual server
+ hosts: localhost
+ gather_facts: no
+ connection: local
+ vars:
+    # Variables that will be used to define the F5 virtual server.
+    f5_server: 'localhost'
+    f5_user: 'admin'
+    f5_password: 'password'
+    f5_virtual_server_name: 'my-virtual-server'
+    f5_virtual_server_address: '192.168.1.10'
+    f5_virtual_server_port: '80'
+    f5_virtual_server_profiles:
+      - 'http'
+      - 'clientssl'
+
+ tasks:
+    - name: Create an F5 virtual server
+      bigip_virtual_server:
+        server: "{{ f5_server }}"
+        user: "{{ f5_user }}"
+        password: "{{ f5_password }}"
+        server_port: "{{ f5_virtual_server_port }}"
+        server_ip: "{{ f5_virtual_server_address }}"
+        name: "{{ f5_virtual_server_name }}"
+        profiles: "{{ f5_virtual_server_profiles }}"
+        state: 'present'
+      register: vs_creation_result
+
+    - name: Display the result of the virtual server creation
+      debug:
+        var: vs_creation_result
