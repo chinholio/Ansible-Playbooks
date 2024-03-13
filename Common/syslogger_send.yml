@@ -1,0 +1,28 @@
+---
+- name: Send Message to Multiple Syslog Servers
+  hosts: localhost
+  gather_facts: no
+
+  vars:
+    syslog_servers:
+      - { ip: "server1.example.com", port: 514, username: "user1", password: "pass1" }
+      - { ip: "server2.example.com", port: 514, username: "user2", password: "pass2" }
+      # Add more servers as needed
+
+    message: "Hello from Ansible"
+    process_name: "MyApp"
+    priority_level: "info"
+
+  tasks:
+    - name: Send message to syslog servers
+      community.general.syslogger:
+        msg: "{{ message }}"
+        facility: "local0"
+        ident: "{{ process_name }}"
+        priority: "{{ priority_level }}"
+        host: "{{ item.ip }}"
+        port: "{{ item.port }}"
+        username: "{{ item.username }}"
+        password: "{{ item.password }}"
+      delegate_to: localhost
+      loop: "{{ syslog_servers }}"
