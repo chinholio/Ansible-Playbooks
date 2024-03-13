@@ -1,0 +1,36 @@
+---
+- name: Check FTP Directory for File (with Authentication and Regex)
+  hosts: your_ftp_server
+  gather_facts: no
+
+  vars:
+    ftp_username: your_username
+    ftp_password: your_password
+    file_regex_pattern: "^your_file_prefix.*\\.txt$"  # Modify this regex pattern
+
+  tasks:
+    - name: List files in the FTP directory
+      shell: "ls /path/to/your/ftp/directory"
+      register: ftp_files
+      delegate_to: localhost
+
+    - name: Check if any file matches the regex pattern
+      debug:
+        msg: "Found a matching file: {{ item }}"
+      with_items: "{{ ftp_files.stdout_lines }}"
+      when: item | regex_search(file_regex_pattern)
+
+    - name: Report no matching files
+      debug:
+        msg: "No matching files found"
+      when: ftp_files.stdout_lines | length == 0 or not ftp_files.stdout_lines | select('match', file_regex_pattern) | list
+
+    - name: Check file age (modify this as needed)
+      set_fact:
+        file_age_days: "{{ (ansible_date_time.epoch|int - file_data.stat.mtime|int) / 86400 }}"
+      when: item | regex_search(file_regex_pattern)
+
+    - name: Check if file is older than X days (modify the threshold)
+      fail:
+        msg: "The file is too old ({{ file_age_days }} days)"
+      when: file_age_days > 7  # Change this threshold as desired
