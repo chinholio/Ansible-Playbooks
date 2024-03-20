@@ -1,18 +1,27 @@
+# Ansible playbook to encrypt a string using Ansible Vault
 ---
-- name: Encrypt String Using Ansible Vault
+- name: Encrypt string using Ansible Vault
   hosts: localhost
   gather_facts: no
-
   vars:
-    my_secret_string: "My super secret string"
+    my_string: "This is a secret string"
 
   tasks:
-    - name: Encrypt the string
-      command: ansible-vault encrypt_string --stdin-name "my_encrypted_string"
-      args:
-        stdin: "{{ my_secret_string }}"
-      register: encrypted_result
+    - name: Encrypt the string using Ansible Vault
+      ansible.builtin.shell:
+        cmd: echo "{{ my_string }}" | ansible-vault encrypt_string --vault-password-file /path/to/vault_password_file
+      register: encrypted_string
 
-    - name: Display the encrypted value
-      debug:
-        var: encrypted_result.stdout_lines[0]
+    - name: Write the encrypted string to a file
+      ansible.builtin.copy:
+        content: "{{ encrypted_string.stdout }}"
+        dest: /path/to/output_file
+
+    - name: Read the encrypted string from the file
+      ansible.builtin.shell:
+        cmd: cat /path/to/output_file
+      register: read_encrypted_string
+
+    - name: Print the encrypted string
+      ansible.builtin.debug:
+        var: read_encrypted_string.stdout
