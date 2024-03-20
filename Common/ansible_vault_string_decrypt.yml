@@ -1,0 +1,23 @@
+# Ansible playbook to decrypt an encrypted string using Ansible Vault
+---
+- name: Decrypt string using Ansible Vault
+  hosts: localhost
+  gather_facts: no
+  vars:
+    encrypted_file: "/path/to/output_file"
+    vault_password_file: "/path/to/vault_password_file"
+
+  tasks:
+    - name: Read the encrypted string from the file
+      ansible.builtin.shell:
+        cmd: cat "{{ encrypted_file }}"
+      register: read_encrypted_string
+
+    - name: Decrypt the string using Ansible Vault
+      ansible.builtin.shell:
+        cmd: echo "{{ read_encrypted_string.stdout }}" | ansible-vault decrypt --vault-password-file "{{ vault_password_file }}"
+      register: decrypted_string
+
+    - name: Print the decrypted string
+      ansible.builtin.debug:
+        var: decrypted_string.stdout
